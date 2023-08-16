@@ -1,6 +1,9 @@
 use std::{io, vec};
 
+const PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 fn main() {
+    println!("Running in Version: {PKG_VERSION}, starting...");
     println!("Encode Message(1), Decode Message(2)");
     let answer = get_input();
 
