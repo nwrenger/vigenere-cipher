@@ -67,7 +67,7 @@ fn vigenere(string: &str, key: &str, encode: bool) -> String {
 fn get_input() -> String {
     loop {
         let mut input = String::new();
-        if io::stdin().read_line(&mut input).is_ok() && input.trim() != "" {
+        if io::stdin().read_line(&mut input).is_ok() {
             return input;
         }
         println!("Wrong input");
