@@ -1,67 +1,81 @@
-use std::{io, vec};
+use std::io;
 
-const PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
+const ALPHABET_SIZE: u8 = 26;
 
 fn main() {
-    println!("Running in Version: {PKG_VERSION}, starting...");
+    println!(
+        "Running in Version: {}, starting...",
+        env!("CARGO_PKG_VERSION")
+    );
+    println!("Disclaimer: This only works correctly with the English alphabet!");
     println!("Encode Message(1), Decode Message(2)");
-    let answer = get_input();
 
+    let answer = get_input();
     let encode = match answer.trim() {
         "1" => true,
         "2" => false,
         _ => {
             println!("Wrong Input");
+            main();
             return;
         }
     };
 
     println!("Input Message:");
     let message = get_input();
-    let (result, offset) = caesar(&message, encode);
+    println!("Input Key (only alphabet, numbers etc. won't do anything!):");
+    let key = get_input();
+
+    let result = vigenere(&message, &key, encode);
+
     if encode {
         println!("Encoded Message:")
     } else {
         println!("Decoded Message:")
     }
+
     print!("{}", result);
-    println!("With offset: {:?}", offset)
 }
 
-fn caesar(string: &str, encode: bool) -> (String, Vec<usize>) {
-    let alphabet: Vec<char> = ('a'..='z').collect();
+fn vigenere(string: &str, key: &str, encode: bool) -> String {
     let mut result = String::with_capacity(string.len());
-    let mut offset_list: Vec<usize> = vec![];
+    let mut nth = 0;
 
     for c in string.chars() {
         if c.is_alphabetic() {
-            let lowercase = c.to_lowercase().next().unwrap();
-            let index = (lowercase as u8 - b'a') as usize;
-            println!("Offset for {c}: ");
-            let offset: usize = get_input().trim().parse().unwrap();
-            offset_list.push(offset);
-            let new_index = if encode {
-                (index + offset) % 26
+            let index = c as u8 - to_ascii_u8(c);
+            let offset = key.chars().cycle().nth(nth).map(to_ascii_u8).unwrap_or(0);
+            let shifted = (if encode {
+                (index + offset) % ALPHABET_SIZE
             } else {
-                (index + 26 - (offset % 26)) % 26
-            };
+                (index + ALPHABET_SIZE - (offset % ALPHABET_SIZE)) % ALPHABET_SIZE
+            } + to_ascii_u8(c)) as char;
 
-            let new_char: char = alphabet[new_index];
-            if c.is_uppercase() {
-                result.push(new_char.to_ascii_uppercase());
-            } else {
-                result.push(new_char);
-            }
+            result.push(shifted);
+
+            nth = (nth + 1) % key.len();
         } else {
             result.push(c);
         }
     }
 
-    (result, offset_list)
+    result
 }
 
 fn get_input() -> String {
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).unwrap();
-    input
+    loop {
+        let mut input = String::new();
+        if io::stdin().read_line(&mut input).is_ok() && input.trim() != "" {
+            return input;
+        }
+        println!("Wrong input");
+    }
+}
+
+fn to_ascii_u8(c: char) -> u8 {
+    if c.is_ascii_uppercase() {
+        b'A'
+    } else {
+        b'a'
+    }
 }
