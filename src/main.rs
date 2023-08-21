@@ -35,6 +35,8 @@ fn main() {
     }
 
     print!("{}", result);
+    println!("Press enter or close the Terminal");
+    get_input();
 }
 
 fn vigenere(string: &str, key: &str, encode: bool) -> String {
