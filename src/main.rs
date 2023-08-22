@@ -51,7 +51,14 @@ fn vigenere(string: &str, key: &str, encode: bool) -> String {
                 .chars()
                 .cycle()
                 .nth(nth)
-                .map(|c| c as u8 - to_ascii_u8(c))
+                .map(|c| {
+                    c as u8
+                        - if c.is_alphabetic() {
+                            to_ascii_u8(c)
+                        } else {
+                            c as u8
+                        }
+                })
                 .unwrap_or(0);
             let shifted = (if encode {
                 (index + offset) % ALPHABET_SIZE
