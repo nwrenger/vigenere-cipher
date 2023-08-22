@@ -68,10 +68,10 @@ fn vigenere(string: &str, key: &str, encode: bool) -> String {
 
             result.push(shifted);
 
-            nth = (nth + 1) % key.len();
         } else {
             result.push(c);
         }
+        nth = (nth + 1) % key.len();
     }
 
     result
