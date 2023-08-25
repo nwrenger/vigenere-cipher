@@ -1,7 +1,5 @@
 use std::io;
 
-const ALPHABET_SIZE: u8 = 26;
-
 fn main() {
     println!(
         "Running in Version: {}, starting...",
@@ -46,13 +44,9 @@ fn vigenere(string: &str, key: &str, encode: bool) -> String {
         .map(|f| {
             if f.0.is_ascii_alphabetic() {
                 (if encode {
-                    ((f.0 as u8 - to_ascii_u8(f.0)) + (f.1 as u8 - to_ascii_u8(f.1)))
-                        % ALPHABET_SIZE
+                    ((f.0 as u8 - to_ascii_u8(f.0)) + (f.1 as u8 - to_ascii_u8(f.1))) % 26
                 } else {
-                    (f.0 as u8
-                        - to_ascii_u8(f.0)
-                        - ((f.1 as u8 - to_ascii_u8(f.1)) % ALPHABET_SIZE))
-                        % ALPHABET_SIZE
+                    ((f.0 as u8 - to_ascii_u8(f.0) + 26) - (f.1 as u8 - to_ascii_u8(f.1))) % 26
                 } + to_ascii_u8(f.0)) as char
             } else {
                 f.0
