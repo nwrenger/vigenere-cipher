@@ -40,41 +40,25 @@ fn main() {
 }
 
 fn vigenere(string: &str, key: &str, encode: bool) -> String {
-    let mut result = String::with_capacity(string.len());
-    let mut nth = 0;
-
-    for c in string.chars() {
-        if c.is_alphabetic() {
-            let index = c as u8 - to_ascii_u8(c);
-            let offset = key
-                .trim()
-                .chars()
-                .cycle()
-                .nth(nth)
-                .map(|c| {
-                    c as u8
-                        - if c.is_alphabetic() {
-                            to_ascii_u8(c)
-                        } else {
-                            c as u8
-                        }
-                })
-                .unwrap_or(0);
-            let shifted = (if encode {
-                (index + offset) % ALPHABET_SIZE
+    string
+        .chars()
+        .zip(key.trim().chars().cycle())
+        .map(|f| {
+            if f.0.is_ascii_alphabetic() {
+                (if encode {
+                    ((f.0 as u8 - to_ascii_u8(f.0)) + (f.1 as u8 - to_ascii_u8(f.1)))
+                        % ALPHABET_SIZE
+                } else {
+                    (f.0 as u8
+                        - to_ascii_u8(f.0)
+                        - ((f.1 as u8 - to_ascii_u8(f.1)) % ALPHABET_SIZE))
+                        % ALPHABET_SIZE
+                } + to_ascii_u8(f.0)) as char
             } else {
-                (index + ALPHABET_SIZE - (offset % ALPHABET_SIZE)) % ALPHABET_SIZE
-            } + to_ascii_u8(c)) as char;
-
-            result.push(shifted);
-
-        } else {
-            result.push(c);
-        }
-        nth = (nth + 1) % key.len();
-    }
-
-    result
+                f.0
+            }
+        })
+        .collect()
 }
 
 fn get_input() -> String {
@@ -88,9 +72,13 @@ fn get_input() -> String {
 }
 
 fn to_ascii_u8(c: char) -> u8 {
-    if c.is_ascii_uppercase() {
-        b'A'
+    if c.is_ascii_alphabetic() {
+        if c.is_ascii_uppercase() {
+            b'A'
+        } else {
+            b'a'
+        }
     } else {
-        b'a'
+        0
     }
 }
