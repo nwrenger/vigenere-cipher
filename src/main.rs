@@ -6,15 +6,14 @@ fn main() {
         env!("CARGO_PKG_VERSION")
     );
     println!("Disclaimer: This only works correctly with the English alphabet!");
-    println!("Encode Message(1), Decode Message(2)");
+    println!("Encode Message(1), Decode Message(2):");
 
     let answer = get_input();
     let encode = match answer.trim() {
         "1" => true,
         "2" => false,
         _ => {
-            println!("Wrong Input");
-            main();
+            println!("Invalid input. Please enter 1 or 2.");
             return;
         }
     };
