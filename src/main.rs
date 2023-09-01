@@ -18,12 +18,16 @@ fn main() {
         }
     };
 
-    println!("Input Message:");
+    println!("Cipher:");
     let message = get_input();
-    println!("Input Key (only alphabet, numbers etc. won't do anything!):");
+    println!("Key:");
     let key = get_input();
 
-    let result = vigenere(&message, &key, encode);
+    let result: String = message
+        .chars()
+        .zip(key.trim().chars().cycle())
+        .map(|x| vigenere(x, encode))
+        .collect();
 
     if encode {
         println!("Encoded Message:")
@@ -36,22 +40,16 @@ fn main() {
     get_input();
 }
 
-fn vigenere(string: &str, key: &str, encode: bool) -> String {
-    string
-        .chars()
-        .zip(key.trim().chars().cycle())
-        .map(|f| {
-            if f.0.is_ascii_alphabetic() {
-                (if encode {
-                    ((f.0 as u8 - to_ascii_u8(f.0)) + (f.1 as u8 - to_ascii_u8(f.1))) % 26
-                } else {
-                    ((f.0 as u8 - to_ascii_u8(f.0) + 26) - (f.1 as u8 - to_ascii_u8(f.1))) % 26
-                } + to_ascii_u8(f.0)) as char
-            } else {
-                f.0
-            }
-        })
-        .collect()
+fn vigenere(x: (char, char), encode: bool) -> char {
+    let (c, k) = x;
+    let shift = (k.to_ascii_lowercase() as u8 - b'a') as i32;
+    let operation = if encode { shift } else { -shift };
+
+    match c {
+        'a'..='z' => (((c as u8 - b'a') as i32 + operation).rem_euclid(26) as u8 + b'a') as char,
+        'A'..='Z' => (((c as u8 - b'A') as i32 + operation).rem_euclid(26) as u8 + b'A') as char,
+        _ => c,
+    }
 }
 
 fn get_input() -> String {
@@ -61,17 +59,5 @@ fn get_input() -> String {
             return input;
         }
         println!("Wrong input");
-    }
-}
-
-fn to_ascii_u8(c: char) -> u8 {
-    if c.is_ascii_alphabetic() {
-        if c.is_ascii_uppercase() {
-            b'A'
-        } else {
-            b'a'
-        }
-    } else {
-        0
     }
 }
